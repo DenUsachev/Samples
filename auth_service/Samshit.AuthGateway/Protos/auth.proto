@@ -1,0 +1,49 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Samshit.AuthGateway";
+
+package auth;
+
+service AuthGrpcService {
+  rpc VerifyBearer(BearerRequest) returns (BearerResponse);
+  rpc GetUser(UserRequest) returns (UserResponse);
+  rpc CreateSession(SessionRequest) returns (SessionResponse);
+}
+
+message UserRequest {
+	int32 userId =1;
+}
+
+message SessionRequest {
+  string userId = 1;
+  int32  campaignId = 2;
+}
+
+message SessionResponse {
+  bool  isSuccess = 1;
+  string sessionJwtToken = 2;
+  string sessionId = 3;
+}
+
+message UserResponse {
+	bool  isSuccess = 1;
+	int32 userId = 2;
+	string email = 3;
+	string first_name = 4;
+	string last_name = 5;
+	int64 created_ut = 6;
+}
+
+message CampaignRequest {
+  int32 channelId = 1;
+}
+
+message BearerRequest {
+  string bearer = 1;
+}
+
+message BearerResponse {
+  bool  isSuccess = 1;
+  int64 userId = 2;
+  string sessionId = 3;
+}

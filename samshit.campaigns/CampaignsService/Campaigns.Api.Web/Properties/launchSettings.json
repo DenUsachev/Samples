@@ -1,0 +1,32 @@
+﻿{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:54491",
+      "sslPort": 44334
+    }
+  },
+  "profiles": {
+    "Campaigns.Api.Web": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "environmentVariables": {
+        "BOT_SMTP_PORT": "465",
+        "DB_PORT": "5432",
+        "SENTRY_DSN_AUTH": "https://200b0556fa464e91b7fa54c6e11be56c@sentry.panic.fail/2",
+        "BOT_SMTP_SECURITY": "SSL",
+        "DB_NAME": "samshit-dev",
+        "BOT_SMTP_MAIL": "robot@samshit.club",
+        "BOT_SMTP_PASSWORD": "NGF4NEtiUnJjTDk2RDhwRjZyaEQ=",
+        "DB_HOST": "10.10.10.31",
+        "DB_USER": "app_camp",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "BOT_SMTP_URL": "smtp.yandex.ru",
+        "DB_PASS": "c7oUOiY0j44NdeawpjU0",
+        "SENTRY_DSN": "https://8e83e94cdfbe4f7fba0647c4e7b5dc26@sentry.panic.fail/6"
+      }
+    }
+  }
+}

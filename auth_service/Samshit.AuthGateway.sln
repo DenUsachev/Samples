@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29920.165
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samshit.AuthGateway", "Samshit.AuthGateway\Samshit.AuthGateway.csproj", "{94023E2F-0AEC-4420-8D22-9C23085942B7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samshit.WebUtils", "Samshit.WebUtils\Samshit.WebUtils.csproj", "{44E2FEF9-EF96-43D4-9D81-24344C690591}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94023E2F-0AEC-4420-8D22-9C23085942B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94023E2F-0AEC-4420-8D22-9C23085942B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94023E2F-0AEC-4420-8D22-9C23085942B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94023E2F-0AEC-4420-8D22-9C23085942B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44E2FEF9-EF96-43D4-9D81-24344C690591}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44E2FEF9-EF96-43D4-9D81-24344C690591}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44E2FEF9-EF96-43D4-9D81-24344C690591}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44E2FEF9-EF96-43D4-9D81-24344C690591}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4461E966-ED06-4E89-B3EE-FAA8393FA880}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,119 @@
+image: docker:dind
+
+services:
+  - docker:dind
+
+stages:
+  - dev-deploy
+  - prod-deploy
+  - notify
+
+variables:
+  TAG: ${CI_COMMIT_SHORT_SHA}
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+### Development pipeline
+build-dev:
+  stage: dev-deploy
+  when: manual
+  image: docker:dind
+  tags:
+    - local
+  script:
+    - printenv
+    - export DOCKER_IMAGE=$DOCKER_REGISTRY_LOCAL_URL/weyr/weyr-api-campaigns:development
+    - echo "$DOCKER_REGISTRY_LOCAL_PASSWORD" | base64 -d - | docker login -u "$DOCKER_REGISTRY_LOCAL_USERNAME" --password-stdin $DOCKER_REGISTRY_LOCAL_URL
+    - docker build -t "$DOCKER_IMAGE" .
+    - docker push "$DOCKER_IMAGE"
+
+deploy-dev:
+  stage: dev-deploy
+  when: manual
+  variables:
+    DOCKER_HOST: tcp://10.10.10.11:2376
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "./certs"
+    DB_USER: "$DB_USER"
+    DB_PASS: "$DB_PASS"
+    DB_NAME: "samshit-dev"
+    DB_PORT: "5432"
+    DB_HOST: "10.10.10.31"
+  tags:
+    - remote
+  image: docker:dind
+  script:
+    - export DOCKER_IMAGE=$DOCKER_REGISTRY_LOCAL_URL/weyr/weyr-api-campaigns:development
+    - export DOMAIN_NAME=api-dev.weyr.io
+    - export PATH_NAME=/campaigns
+
+    - mkdir -p $DOCKER_CERT_PATH
+    - echo "$TLSCACERT" > $DOCKER_CERT_PATH/ca.pem
+    - echo "$TLSCERT" > $DOCKER_CERT_PATH/cert.pem
+    - echo "$TLSKEY" > $DOCKER_CERT_PATH/key.pem
+    - chmod 755 -R ./
+
+    - echo "$DOCKER_REGISTRY_LOCAL_PASSWORD" | base64 -d - | docker login -u "$DOCKER_REGISTRY_LOCAL_USERNAME" --password-stdin $DOCKER_REGISTRY_LOCAL_URL
+
+    - docker pull "$DOCKER_IMAGE"
+    - docker stack deploy -c ./deploy/ci/development.yml api-campaigns-dev --with-registry-auth
+  after_script:
+    - sh ./deploy/notifications/notify.sh DONE ✅
+
+# ### Production pipeline
+build-prod:
+  stage: prod-deploy
+  when: manual
+  image: docker:dind
+  only:
+    - master
+  tags:
+    - local
+  script:
+    - export DOCKER_IMAGE=$DOCKER_REGISTRY_LOCAL_URL/weyr/weyr-api-campaigns:latest
+    - echo "$DOCKER_REGISTRY_LOCAL_PASSWORD" | base64 -d - | docker login -u "$DOCKER_REGISTRY_LOCAL_USERNAME" --password-stdin $DOCKER_REGISTRY_LOCAL_URL
+    - docker build -t "$DOCKER_IMAGE" .
+    - docker push "$DOCKER_IMAGE"
+
+deploy-prod:
+  stage: prod-deploy
+  when: manual
+  only:
+    - master
+  variables:
+    DOCKER_HOST: tcp://10.10.10.11:2376
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "./certs"
+    DB_USER: "$DB_USER"
+    DB_PASS: "$DB_PASS"
+    DB_NAME: "samshit-dev"
+    DB_PORT: "5432"
+    DB_HOST: "10.10.10.31"
+  tags:
+    - remote
+  image: docker:dind
+  script:
+    - export DOCKER_IMAGE=$DOCKER_REGISTRY_LOCAL_URL/weyr/weyr-api-campaigns:latest
+    - export DOMAIN_NAME=api.weyr.io
+    - export PATH_NAME=/campaigns
+
+    - mkdir -p $DOCKER_CERT_PATH
+    - echo "$TLSCACERT" > $DOCKER_CERT_PATH/ca.pem
+    - echo "$TLSCERT" > $DOCKER_CERT_PATH/cert.pem
+    - echo "$TLSKEY" > $DOCKER_CERT_PATH/key.pem
+    - chmod 755 -R ./
+
+    - echo "$DOCKER_REGISTRY_LOCAL_PASSWORD" | base64 -d - | docker login -u "$DOCKER_REGISTRY_LOCAL_USERNAME" --password-stdin $DOCKER_REGISTRY_LOCAL_URL
+
+    - docker pull "$DOCKER_IMAGE"
+    - docker stack deploy -c ./deploy/ci/production.yml api-campaigns-prod --with-registry-auth
+  after_script:
+    - sh ./deploy/notifications/notify.sh DONE ✅
+
+notify_error:
+  stage: notify
+  tags:
+    - remote
+  script:
+    - sh ./deploy/notifications/notify.sh FAILED ❌
+  when: on_failure

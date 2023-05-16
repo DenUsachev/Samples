@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  api-auth-dev:
+    image: "$DOCKER_IMAGE"
+    environment:
+      - DB_HOST=$DB_HOST
+      - DB_PORT=$DB_PORT
+      - DB_NAME=$DB_NAME
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
+      - BOT_SMTP_MAIL=$BOT_SMTP_MAIL
+      - BOT_SMTP_PASSWORD=$BOT_SMTP_PASSWORD
+      - BOT_SMTP_PORT=$BOT_SMTP_PORT
+      - BOT_SMTP_SECURITY=$BOT_SMTP_SECURITY
+      - BOT_SMTP_URL=$BOT_SMTP_URL
+      - ASPNETCORE_ENVIRONMENT=Development
+      - SENTRY_DSN=$SENTRY_DSN_API_AUTH
+    networks:
+      - samnet-dev
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=samnet-dev
+
+        - traefik.http.routers.dev__api_auth.rule=Host(`${DOMAIN_NAME}`) && PathPrefix(`${PATH_NAME}`)
+        - traefik.http.routers.dev__api_auth.entrypoints=https
+        - traefik.http.routers.dev__api_auth.service=dev__api_auth
+        - traefik.http.routers.dev__api_auth.tls.certresolver=letsencrypt
+
+        - traefik.http.services.dev__api_auth.loadbalancer.server.port=8890
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 5
+        window: 120s
+      update_config:
+        parallelism: 1
+        delay: 10s
+
+networks:
+  samnet-dev:
+    external: true
